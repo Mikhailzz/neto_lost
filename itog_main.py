@@ -270,6 +270,8 @@ for event in botik.longpoll.listen():
 
 
 
+
+
                     if event.user_id not in user_flag_in:
                         user_flag_in[event.user_id] = 0
 
@@ -598,6 +600,7 @@ for event in botik.longpoll.listen():
                                 search_dict.pop(event.user_id)
                                 user_all_dict.pop(event.user_id)
                                 user_flag_in[event.user_id] = 0
+                                continue
 
                         else:
 
