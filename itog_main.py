@@ -269,6 +269,7 @@ for event in botik.longpoll.listen():
 
 
 
+
                     if event.user_id not in user_flag_in:
                         user_flag_in[event.user_id] = 0
 
@@ -601,6 +602,7 @@ for event in botik.longpoll.listen():
                                 user_all_dict[event.user_id].user_update_stop['status'] = 0
                                 search_dict.pop(event.user_id)
                                 user_all_dict[event.user_id].ind = 0
+                                user_all_dict.pop(event.user_id)
 
                         else:
 
@@ -628,6 +630,8 @@ for event in botik.longpoll.listen():
                                     user_all_dict[event.user_id].user_update_stop['status'] = 0
                                     search_dict.pop(event.user_id)
                                     user_all_dict[event.user_id].ind = 0
+
+
 
 
                                 list_human.append(serch_res[index])
@@ -684,6 +688,11 @@ for event in botik.longpoll.listen():
 
                                 user_all_dict[event.user_id].ind = index
 
+                                if user_all_dict[event.user_id].user_update_stop['all'] == 0:
+                                    search_dict.pop(event.user_id)
+
+
+
 
 
                                 break
@@ -698,6 +707,7 @@ for event in botik.longpoll.listen():
                                 user_all_dict[event.user_id].user_update_stop['status'] = 0
                                 search_dict.pop(event.user_id)
                                 user_all_dict[event.user_id].ind = 0
+                                user_all_dict.pop(event.user_id)
                                 break
 
             else:
