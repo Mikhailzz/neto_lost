@@ -383,7 +383,7 @@ def age_to(request, user:VK, bot:VKBot, user_dict, user_id):
             flag = check_params(user.param_search, user_dict, user_id, bot)
 
             if flag == 0:
-                bot.write_msg(event.user_id, f"Параметры успешно созданы, введите: поиск класс")
+                bot.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
                 user_flag_in[event.user_id] = 1
     else:
         bot.write_msg(event.user_id, f"Возвраст до неверен")
