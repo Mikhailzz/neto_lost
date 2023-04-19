@@ -392,26 +392,30 @@ for event in botik.longpoll.listen():
                         if user_all_dict[event.user_id].user_update_stop['sex'] == 0:
                             gender_dict = dict()
                             gender = request.split(' ')
+                            gender_flag = 0
                             if len(gender) == 2 and gender[1] == 'мужской':
                                 gender_dict['sex'] = 1
+                                gender_flag = 1
+
                                 user_all_dict[event.user_id].user_update_stop['sex'] = 1
                             elif len(gender) == 2 and gender[1] == 'женский':
                                 gender_dict['sex'] = 2
+                                gender_flag = 1
                                 user_all_dict[event.user_id].user_update_stop['sex'] = 1
                             else:
                                 botik.write_msg(event.user_id, f"Повторите ввод пола")
                                 user_all_dict[event.user_id].user_update_stop['sex'] = 0
-                                gender_dict['sex'] = 0
 
+                            if gender_flag == 1:
 
-                            user_all_dict[event.user_id].param_search.update(gender_dict)
+                                user_all_dict[event.user_id].param_search.update(gender_dict)
 
+                                flag = check_params(user_all_dict[event.user_id].param_search)
 
-                            flag = check_params(user_all_dict[event.user_id].param_search)
+                                if flag == 0:
+                                    botik.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
+                                    user_flag_in[event.user_id] = 1
 
-                            if flag == 0:
-                                botik.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
-                                user_flag_in[event.user_id] = 1
 
                         else:
                             botik.write_msg(event.user_id, f"Вы уже ввели пол. Нажмите: параметры")
