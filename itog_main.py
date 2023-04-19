@@ -196,7 +196,7 @@ def check_params(params):
         flag = 1
         botik.write_msg(event.user_id, f"Введите город (Пример: город Тула)")
     else:
-        user_all_dict[event.user_id].user_update_stop['city'] = 1
+        user_all_dict[event.user_id].user_update_stop['town'] = 1
     if params['status'] == 0:
         flag = 1
         botik.write_msg(event.user_id, f"Введите положение (Пример: семейное не женат)")
