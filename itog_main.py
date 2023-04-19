@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
 
 
-with open('Tok') as file_object:
+with open('Tokens.txt') as file_object:
     token_user = file_object.readline().strip()
     token_appl = file_object.readline().strip()
 
