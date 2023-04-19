@@ -180,26 +180,31 @@ def check_params(params):
     if params['sex'] == 0:
         flag = 1
         botik.write_msg(event.user_id, f"Введите свой пол (Пример: пол мужской)")
+        user_all_dict[event.user_id].user_update_stop['sex'] = 0
     else:
         user_all_dict[event.user_id].user_update_stop['sex'] = 1
     if 'age_from' not in params:
         flag = 1
         botik.write_msg(event.user_id, f"Введите возраст первый (Пример: возраст от 20)")
+        user_all_dict[event.user_id].user_update_stop['age_from'] = 0
     else:
         user_all_dict[event.user_id].user_update_stop['age_from'] = 1
     if 'age_to' not in params:
         flag = 1
         botik.write_msg(event.user_id, f"Введите возраст второй (Пример: возраст до 25)")
+        user_all_dict[event.user_id].user_update_stop['age_to'] = 0
     else:
         user_all_dict[event.user_id].user_update_stop['age_to'] = 1
     if 'hometown' not in params:
         flag = 1
         botik.write_msg(event.user_id, f"Введите город (Пример: город Тула)")
+        user_all_dict[event.user_id].user_update_stop['town'] = 0
     else:
         user_all_dict[event.user_id].user_update_stop['town'] = 1
     if params['status'] == 0:
         flag = 1
         botik.write_msg(event.user_id, f"Введите положение (Пример: семейное не женат)")
+        user_all_dict[event.user_id].user_update_stop['status'] = 0
     else:
         user_all_dict[event.user_id].user_update_stop['status'] = 1
     return flag
