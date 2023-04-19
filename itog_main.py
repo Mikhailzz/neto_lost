@@ -64,7 +64,7 @@ session = Session()
 # создание класса бота
 
 
-@staticmethod
+
 def current_keyboard():
     VK_kb = VkKeyboardColor
     keyboard = VkKeyboard(one_time=False)
@@ -77,6 +77,9 @@ def current_keyboard():
 
 
 class VKBot:
+    """
+    создание бота
+    """
 
     def __init__(self, token):
 
@@ -118,8 +121,6 @@ class VK:
         self.user_update_stop['town'] = 0
         self.user_update_stop['status'] = 0
         self.ind = 0
-
-
         self.param_search = {}
 
 
@@ -558,51 +559,27 @@ for event in botik.longpoll.listen():
 
             elif request.lower() == "поиск":
                 if all_flag[event.user_id][0] != 1:
-
-
                     botik.write_msg(event.user_id, 'Напишите с начала: старт, чтобы начать.')
-
                 else:
                     if (event.user_id not in user_flag_in) or (user_flag_in[event.user_id] == 0):
                         user_flag_in[event.user_id] = 0
                         botik.write_msg(event.user_id, 'Поиск невозможен. Нажмите: параметры')
-
-
-
                     elif user_flag_in[event.user_id] == 1:
                         if event.user_id not in search_dict:
                             search_dict[event.user_id] = []
-
                             parametrs_search = user_all_dict[event.user_id].param_search
-
-
                             serch_str = user_all_dict[event.user_id].search(parametrs_search)
-
                             search_dict[event.user_id] = serch_str['response']['items']
-
                             serch_res = search_dict[event.user_id]
-
                             if len(serch_res) == 0:
                                 botik.write_msg(event.user_id,
                                                 f'К сожалению, ничего не найдено. Измените параметры поиска! Нажмите параметры.')
-
                                 search_dict.pop(event.user_id)
                                 user_all_dict.pop(event.user_id)
                                 user_flag_in[event.user_id] = 0
                                 continue
-
                         else:
-
-
                             serch_res = search_dict[event.user_id]
-
-
-
-
-                        list_human = []
-
-
-
 
                         for index in range(user_all_dict[event.user_id].ind, len(serch_res)):
                             if serch_res[index]['is_closed'] == False:
@@ -615,13 +592,6 @@ for event in botik.longpoll.listen():
                                     user_all_dict.pop(event.user_id)
                                     user_flag_in[event.user_id] = 0
                                     break
-
-
-
-
-
-                                list_human.append(serch_res[index])
-
 
                                 photo = user_all_dict[event.user_id].filefoto(serch_res[index]['id'])
 
@@ -646,15 +616,11 @@ for event in botik.longpoll.listen():
                                 else:
                                     continue
 
-                                photttto = photo['response']['items']
+                                photo_live = photo['response']['items']
                                 like_score = 1
                                 comm_score = 3
                                 sort_pgoto = lambda x: (x['likes']['count'], x['comments']['count'])[x['likes']['count']* like_score <=x['comments']['count'] * comm_score]
-
-                                new_sort_data = sorted(photttto, key=sort_pgoto, reverse=True)
-
-
-
+                                new_sort_data = sorted(photo_live, key=sort_pgoto, reverse=True)
                                 count = 0
 
                                 string_attach = ''
@@ -665,21 +631,10 @@ for event in botik.longpoll.listen():
                                     if count == 3:
                                         break
 
-
                                 botik.write_msg(event.user_id, '', attachment = string_attach[:-1])
-
-
-
                                 botik.write_msg(event.user_id, f'https://vk.com/id{serch_res[index]["id"]}')
 
                                 user_all_dict[event.user_id].ind = index
-
-
-
-
-
-
-
                                 break
                             if index == len(serch_res) - 1:
                                 botik.write_msg(event.user_id,
