@@ -166,7 +166,7 @@ def params_search_func(people_info):
     elif sex == 2:
         params_search_dict['sex'] = 1
     if city:
-        params_search_dict['hometown'] = city
+        params_search_dict['hometown'] = city.title()
 
     if year:
         params_search_dict['age_from'] = year - 2
@@ -266,6 +266,9 @@ for event in botik.longpoll.listen():
                         user_all_dict[event.user_id].user_update_stop['all'] = 1
 
 
+
+
+
                     if event.user_id not in user_flag_in:
                         user_flag_in[event.user_id] = 0
 
@@ -353,7 +356,7 @@ for event in botik.longpoll.listen():
                             dict_city = dict()
                             city_request = request.split(' ')
                             if len(city_request) == 2:
-                                city = city_request[1]
+                                city = city_request[1].title()
 
 
 
