@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
 
 
-with open('Tokens.txt') as file_object:
+with open('Tok') as file_object:
     token_user = file_object.readline().strip()
     token_appl = file_object.readline().strip()
 
@@ -104,7 +104,7 @@ class VK:
         self.user_update_stop['age_to'] = 0
         self.user_update_stop['town'] = 0
         self.user_update_stop['status'] = 0
-        self.index = 0
+        self.ind = 0
 
 
         self.param_search = {}
@@ -575,10 +575,13 @@ for event in botik.longpoll.listen():
 
                             parametrs_search = user_all_dict[event.user_id].param_search
 
+
                             serch_str = user_all_dict[event.user_id].search(parametrs_search)
 
                             search_dict[event.user_id] = serch_str['response']['items']
+
                             serch_res = search_dict[event.user_id]
+
                             if len(serch_res) == 0:
                                 botik.write_msg(event.user_id,
                                                 f'К сожалению, ничего не найдено. Измените параметры поиска! Нажмите параметры.')
@@ -589,9 +592,10 @@ for event in botik.longpoll.listen():
                                 user_all_dict[event.user_id].user_update_stop['town'] = 0
                                 user_all_dict[event.user_id].user_update_stop['status'] = 0
                                 search_dict.pop(event.user_id)
-                                user_all_dict[event.user_id].index = 0
+                                user_all_dict[event.user_id].ind = 0
 
                         else:
+
 
                             serch_res = search_dict[event.user_id]
 
@@ -601,8 +605,22 @@ for event in botik.longpoll.listen():
                         list_human = []
 
 
-                        for index in range(user_all_dict[event.user_id].index, len(serch_res)):
+
+
+                        for index in range(user_all_dict[event.user_id].ind, len(serch_res)):
                             if serch_res[index]['is_closed'] == False:
+                                if index == len(serch_res) - 1:
+                                    botik.write_msg(event.user_id,
+                                                    f'Это последний человек. Хотите изменить параметры? Нажмите параметры.')
+                                    user_all_dict[event.user_id].user_update_stop['all'] = 0
+                                    user_all_dict[event.user_id].user_update_stop['sex'] = 0
+                                    user_all_dict[event.user_id].user_update_stop['age_from'] = 0
+                                    user_all_dict[event.user_id].user_update_stop['age_to'] = 0
+                                    user_all_dict[event.user_id].user_update_stop['town'] = 0
+                                    user_all_dict[event.user_id].user_update_stop['status'] = 0
+                                    search_dict.pop(event.user_id)
+                                    user_all_dict[event.user_id].ind = 0
+
 
                                 list_human.append(serch_res[index])
 
@@ -653,8 +671,9 @@ for event in botik.longpoll.listen():
                                 botik.write_msg(event.user_id, '', attachment = string_attach[:-1])
 
 
+
                                 botik.write_msg(event.user_id, f'https://vk.com/id{serch_res[index]["id"]}')
-                                if index + 1 == len(serch_res):
+                                if index == len(serch_res) - 1:
                                     botik.write_msg(event.user_id,
                                                     f'Это последний человек. Хотите изменить параметры? Нажмите параметры.')
                                     user_all_dict[event.user_id].user_update_stop['all'] = 0
@@ -664,12 +683,13 @@ for event in botik.longpoll.listen():
                                     user_all_dict[event.user_id].user_update_stop['town'] = 0
                                     user_all_dict[event.user_id].user_update_stop['status'] = 0
                                     search_dict.pop(event.user_id)
-                                    user_all_dict[event.user_id].index = 0
-                                user_all_dict[event.user_id].index = index
+                                    user_all_dict[event.user_id].ind = 0
+                                user_all_dict[event.user_id].ind = index
+
 
 
                                 break
-                            if index + 1 == len(serch_res):
+                            if index == len(serch_res) - 1:
                                 botik.write_msg(event.user_id,
                                                 f'Это последний человек. Хотите изменить параметры? Нажмите параметры.')
                                 user_all_dict[event.user_id].user_update_stop['all'] = 0
@@ -679,7 +699,7 @@ for event in botik.longpoll.listen():
                                 user_all_dict[event.user_id].user_update_stop['town'] = 0
                                 user_all_dict[event.user_id].user_update_stop['status'] = 0
                                 search_dict.pop(event.user_id)
-                                user_all_dict[event.user_id].index = 0
+                                user_all_dict[event.user_id].ind = 0
                                 break
 
             else:
