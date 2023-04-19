@@ -19,6 +19,9 @@ Base = declarative_base()
 
 
 class Seeker(Base):
+    """
+    таблица ищущих
+    """
     __tablename__ = 'seeker'
 
     id = sq.Column(sq.Integer, primary_key=True)
@@ -27,6 +30,9 @@ class Seeker(Base):
 
 
 class Lover(Base):
+    """
+    таблица найденных и выведенных на экран
+    """
     __tablename__ = 'lover'
 
     id = sq.Column(sq.Integer, primary_key=True)
@@ -39,9 +45,13 @@ class Lover(Base):
 
 
 def create_tables(engine):
+    """
+    создание таблицы
+
+    """
     Base.metadata.create_all(engine)
 
-
+# подключение к базе данных
 
 DSN = 'postgresql://postgres:th2AfrM1n7Dp3@localhost:5432/itog'
 
@@ -89,6 +99,9 @@ class VKBot:
 #создание класса вконтакте
 
 class VK:
+    """
+    класс пользователя ВК
+    """
     def __init__(self, access_token, user_id, version='5.131'):
 
         self.token = access_token
@@ -112,6 +125,9 @@ class VK:
 
 
     def users_info(self):
+        """
+        функция получения информации о пользователе
+        """
         url = 'https://api.vk.com/method/users.get'
         paramss = {'fields':'bdate, sex, home_town, relation'}
         params = {'user_ids': self.id}
@@ -120,6 +136,9 @@ class VK:
 
 
     def filefoto(self, user_id):
+        """
+        функция получения фото
+        """
         params = {'owner_id': user_id,
                   'album_id': 'profile',
                   'photo_sizes': '1',
@@ -130,6 +149,9 @@ class VK:
         return response.json()
 
     def search(self, params):
+        """
+        функция поиска людей
+        """
         main_param = {'count': 1000}
 
         url = 'https://api.vk.com/method/users.search'
@@ -142,6 +164,9 @@ class VK:
 # функция получения параметров поиска
 
 def params_search_func(people_info):
+    """
+    извлекаем параметры из словаря с параметрами, полученным из рапроса
+    """
     if 'sex' in people_info:
         sex = people_info['sex']
     else:
@@ -176,39 +201,192 @@ def params_search_func(people_info):
 
 # функция проверки параметров
 
-def check_params(params):
+def check_params(params, user_dict, user_id, bot:VKBot):
+    """
+    проверка парамеров (если флажок равен 0, то все параметры заданы)
+    """
     flag = 0
     if params['sex'] == 0:
         flag = 1
-        botik.write_msg(event.user_id, f"Введите свой пол (Пример: пол мужской)")
-        user_all_dict[event.user_id].user_update_stop['sex'] = 0
+        bot.write_msg(user_id, f"Введите свой пол (Пример: пол мужской)")
+        user_dict[user_id].user_update_stop['sex'] = 0
     else:
-        user_all_dict[event.user_id].user_update_stop['sex'] = 1
+        user_dict[user_id].user_update_stop['sex'] = 1
     if 'age_from' not in params:
         flag = 1
-        botik.write_msg(event.user_id, f"Введите возраст первый (Пример: возраст от 20)")
-        user_all_dict[event.user_id].user_update_stop['age_from'] = 0
+        bot.write_msg(user_id, f"Введите возраст первый (Пример: возраст от 20)")
+        user_dict[user_id].user_update_stop['age_from'] = 0
     else:
-        user_all_dict[event.user_id].user_update_stop['age_from'] = 1
+        user_dict[user_id].user_update_stop['age_from'] = 1
     if 'age_to' not in params:
         flag = 1
-        botik.write_msg(event.user_id, f"Введите возраст второй (Пример: возраст до 25)")
-        user_all_dict[event.user_id].user_update_stop['age_to'] = 0
+        bot.write_msg(user_id, f"Введите возраст второй (Пример: возраст до 25)")
+        user_dict[user_id].user_update_stop['age_to'] = 0
     else:
-        user_all_dict[event.user_id].user_update_stop['age_to'] = 1
+        user_dict[user_id].user_update_stop['age_to'] = 1
     if 'hometown' not in params:
         flag = 1
-        botik.write_msg(event.user_id, f"Введите город (Пример: город Тула)")
-        user_all_dict[event.user_id].user_update_stop['town'] = 0
+        bot.write_msg(user_id, f"Введите город (Пример: город Тула)")
+        user_dict[user_id].user_update_stop['town'] = 0
     else:
-        user_all_dict[event.user_id].user_update_stop['town'] = 1
+        user_all_dict[user_id].user_update_stop['town'] = 1
     if params['status'] == 0:
         flag = 1
-        botik.write_msg(event.user_id, f"Введите положение (Пример: семейное не женат)")
-        user_all_dict[event.user_id].user_update_stop['status'] = 0
+        bot.write_msg(user_id, f"Введите положение (Пример: семейное не женат)")
+        user_dict[user_id].user_update_stop['status'] = 0
     else:
-        user_all_dict[event.user_id].user_update_stop['status'] = 1
+        user_dict[user_id].user_update_stop['status'] = 1
     return flag
+
+def parameters(user:VK):
+    """
+    здесь задаются параметры
+    """
+    inform_user = user.users_info()
+    people = inform_user['response'][0]
+    if user.user_update_stop['all'] == 0:
+        user.param_search = params_search_func(people)
+        user.user_update_stop['all'] = 1
+    return people
+
+def family(user:VK, request, bot:VKBot, user_id):
+    """
+    этой функцией мы задаём семейное положение
+    """
+    flag_relation = 0
+
+    if user.user_update_stop['status'] == 0:
+
+        if request.lower().endswith('не женат') or request.lower().endswith('не замужем'):
+            user.param_search['status'] = 1
+
+        elif request.lower().endswith('есть друг') or request.lower().endswith('есть подруга'):
+            user.param_search['status'] = 2
+
+        elif request.lower().endswith('помолвлен') or request.lower().endswith('помолвлена'):
+            user.param_search['status'] = 3
+
+        elif request.lower().endswith('женат') or request.lower().endswith('замужем'):
+            user.param_search['status'] = 4
+
+        elif request.lower().endswith('всё сложно'):
+            user.param_search['status'] = 5
+
+        elif request.lower().endswith('в активном поиске'):
+            user.param_search['status'] = 6
+
+        elif request.lower().endswith('влюблён') or request.lower().endswith('влюблена'):
+            user.param_search['status'] = 7
+
+        elif request.lower().endswith('в гражданском браке'):
+            user.param_search['status'] = 8
+
+        else:
+            bot.write_msg(user_id, f"Неверный ввод статуса")
+
+            flag_relation = 1
+
+    return flag_relation
+
+
+def home_town(user:VK, string_city):
+    """
+    этой функцией мы задаём город родной
+    """
+    dict_city = dict()
+    city = string_city
+    dict_city['hometown'] = city
+    user.param_search.update(dict_city)
+    user.user_update_stop['town'] = 1
+
+
+def gender(request, user:VK, bot:VKBot):
+    """
+    этой функцией мы задаём пол
+    """
+    gender_dict = dict()
+    gender = request.split(' ')
+    gender_flag = 0
+    if len(gender) == 2 and gender[1] == 'мужской':
+        gender_dict['sex'] = 1
+        gender_flag = 1
+        user.user_update_stop['sex'] = 1
+    elif len(gender) == 2 and gender[1] == 'женский':
+        gender_dict['sex'] = 2
+        gender_flag = 1
+        user.user_update_stop['sex'] = 1
+    else:
+        bot.write_msg(event.user_id, f"Повторите ввод пола")
+        user.user_update_stop['sex'] = 0
+
+    if gender_flag == 1:
+        user.param_search.update(gender_dict)
+
+    return gender_flag
+
+def age_from(request, user:VK, bot:VKBot, user_dict, user_id):
+    """
+    этой функцией мы задаём возраст от
+    """
+    dict_age_from = dict()
+    age_from = request.split(' ')
+    if (len(age_from) == 3) and (age_from[2].isdigit()):
+        dict_age_from['age_from'] = int(age_from[2])
+        if ('age_to' in user.param_search) and (80 > dict_age_from['age_from'] > 18):
+            if user.param_search['age_to'] > dict_age_from['age_from']:
+                user.user_update_stop['age_from'] = 1
+                user.param_search.update(dict_age_from)
+                flag = check_params(user.param_search, user_dict, user_id, bot)
+                if flag == 0:
+                    bot.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
+                    user_flag_in[event.user_id] = 1
+            else:
+
+                bot.write_msg(event.user_id, f"Возвраст от неверен")
+        elif ('age_to' not in user.param_search) and (
+                80 > dict_age_from['age_from'] > 18):
+            user.user_update_stop['age_from'] = 1
+            user.param_search.update(dict_age_from)
+            flag = check_params(user.param_search, user_dict, user_id, bot)
+            if flag == 0:
+                bot.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
+                user_flag_in[event.user_id] = 1
+    else:
+        bot.write_msg(event.user_id, f"Возраст от неверен")
+
+def age_to(request, user:VK, bot:VKBot, user_dict, user_id):
+    """
+    этой функцией мы задаём возраст до
+    """
+    dict_age_to = dict()
+    age_to = request.split(' ')
+    if (len(age_to) == 3) and (age_to[2].isdigit()):
+        dict_age_to['age_to'] = int(age_to[2])
+        if ('age_from' in user.param_search) and (80 > dict_age_to['age_to'] > 18):
+            if user.param_search['age_from'] < dict_age_to['age_to']:
+                user.param_search.update(dict_age_to)
+                user.user_update_stop['age_to'] = 1
+
+                flag = check_params(user.param_search, user_dict, user_id, bot)
+
+                if flag == 0:
+                    bot.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
+                    user_flag_in[event.user_id] = 1
+            else:
+                bot.write_msg(event.user_id, f"Возвраст до неверен")
+        elif ('age_from' not in user_all_dict[event.user_id].param_search) and (
+                80 > dict_age_to['age_to'] > 18):
+            user.param_search.update(dict_age_to)
+            user.user_update_stop['age_to'] = 1
+
+            flag = check_params(user.param_search, user_dict, user_id, bot)
+
+            if flag == 0:
+                bot.write_msg(event.user_id, f"Параметры успешно созданы, введите: поиск класс")
+                user_flag_in[event.user_id] = 1
+    else:
+        bot.write_msg(event.user_id, f"Возвраст до неверен")
+
 
 # начало программы
 
@@ -250,40 +428,20 @@ for event in botik.longpoll.listen():
 
             elif request.lower() == 'параметры':
                 if all_flag[event.user_id][0] != 1:
-
                     botik.write_msg(event.user_id, 'Напишите с начала: старт, чтобы начать.')
-
                 else:
-
                     if event.user_id not in user_all_dict:
                         user_all_dict[event.user_id] = VK(token_user, event.user_id)
-                    inform_user = user_all_dict[event.user_id].users_info()
-                    people = inform_user['response'][0]
-
+                    people = parameters(user_all_dict[event.user_id])
                     q = session.query(Seeker).filter(Seeker.id == people['id'])
                     if not q.all():
                         people_base_seeker = Seeker(id=people['id'], first_name=people['first_name'],
                                                     last_name=people['last_name'])
                         session.add(people_base_seeker)
                         session.commit()
-
-
-                    if user_all_dict[event.user_id].user_update_stop['all'] == 0:
-                        user_all_dict[event.user_id].param_search = params_search_func(people)
-                        user_all_dict[event.user_id].user_update_stop['all'] = 1
-
-
-
-
-
-
-
-
                     if event.user_id not in user_flag_in:
                         user_flag_in[event.user_id] = 0
-
-                    flag = check_params(user_all_dict[event.user_id].param_search)
-
+                    flag = check_params(user_all_dict[event.user_id].param_search, user_all_dict, event.user_id, botik)
                     if flag == 0:
                         botik.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
                         user_flag_in[event.user_id] = 1
@@ -293,56 +451,17 @@ for event in botik.longpoll.listen():
 
             elif request.lower().startswith('семейное'):
                 if all_flag[event.user_id][0] != 1:
-
                     botik.write_msg(event.user_id, 'Напишите с начала: старт, чтобы начать.')
-
                 else:
-
-
                     if event.user_id in user_all_dict:
                         if user_all_dict[event.user_id].user_update_stop['status'] == 0:
-                            flag_relation = 0
-                            if request.lower().endswith('не женат') or request.lower().endswith('не замужем'):
-                                user_all_dict[event.user_id].param_search['status'] = 1
-
-                            elif request.lower().endswith('есть друг') or request.lower().endswith('есть подруга'):
-                                user_all_dict[event.user_id].param_search['status'] = 2
-
-                            elif request.lower().endswith('помолвлен') or request.lower().endswith('помолвлена'):
-                                user_all_dict[event.user_id].param_search['status'] = 3
-
-                            elif request.lower().endswith('женат') or request.lower().endswith('замужем'):
-                                user_all_dict[event.user_id].param_search['status'] = 4
-
-                            elif request.lower().endswith('всё сложно'):
-                                user_all_dict[event.user_id].param_search['status'] = 5
-
-                            elif request.lower().endswith('в активном поиске'):
-                                user_all_dict[event.user_id].param_search['status'] = 6
-
-                            elif request.lower().endswith('влюблён') or request.lower().endswith('влюблена'):
-                                user_all_dict[event.user_id].param_search['status'] = 7
-
-                            elif request.lower().endswith('в гражданском браке'):
-                                user_all_dict[event.user_id].param_search['status'] = 8
-
-                            else:
-                                botik.write_msg(event.user_id, f"Неверный ввод статуса")
-
-                                flag_relation = 1
-
-
+                            flag_relation = family(user_all_dict[event.user_id], request, botik, event.user_id)
                             if flag_relation == 0:
-
                                 user_all_dict[event.user_id].user_update_stop['status'] = 1
-
-                                flag = check_params(user_all_dict[event.user_id].param_search)
-
+                                flag = check_params(user_all_dict[event.user_id].param_search, user_all_dict, event.user_id, botik)
                                 if flag == 0:
                                     botik.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
                                     user_flag_in[event.user_id] = 1
-
-
                         else:
                             botik.write_msg(event.user_id, f"Вы уже ввели семейное положение. Нажмите: параметры")
 
@@ -354,43 +473,23 @@ for event in botik.longpoll.listen():
             # задание города
             elif request.lower().startswith('город'):
                 if all_flag[event.user_id][0] != 1:
-
                     botik.write_msg(event.user_id, 'Напишите с начала: старт, чтобы начать.')
-
                 else:
-
-
                     if event.user_id in user_all_dict:
-
                         if user_all_dict[event.user_id].user_update_stop['town'] == 0:
-
+                            home_town(user_all_dict[event.user_id], request)
                             dict_city = dict()
                             city_request = request.split(' ')
                             if len(city_request) == 2:
-                                city = city_request[1].title()
-
-
-
-
-                                dict_city['hometown'] = city
-
-
-                                user_all_dict[event.user_id].param_search.update(dict_city)
-                                user_all_dict[event.user_id].user_update_stop['town'] = 1
-
-                                flag = check_params(user_all_dict[event.user_id].param_search)
-
+                                home_town(user_all_dict[event.user_id], city_request[1].title())
+                                flag = check_params(user_all_dict[event.user_id].param_search, user_all_dict, event.user_id, botik)
                                 if flag == 0:
                                     botik.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
                                     user_flag_in[event.user_id] = 1
-
                             else:
                                 botik.write_msg(event.user_id, f"Ввод города некорректен")
-
                         else:
                             botik.write_msg(event.user_id, f"Вы уже ввели город. Нажмите: параметры")
-
-
                     else:
                         botik.write_msg(event.user_id, f"Сначала нужно нажать: параметры")
 
@@ -401,41 +500,16 @@ for event in botik.longpoll.listen():
 
             elif request.lower().startswith('пол'):
                 if all_flag[event.user_id][0] != 1:
-
                     botik.write_msg(event.user_id, 'Напишите с начала: старт, чтобы начать.')
-
                 else:
-
-
                     if event.user_id in user_all_dict:
                         if user_all_dict[event.user_id].user_update_stop['sex'] == 0:
-                            gender_dict = dict()
-                            gender = request.split(' ')
-                            gender_flag = 0
-                            if len(gender) == 2 and gender[1] == 'мужской':
-                                gender_dict['sex'] = 1
-                                gender_flag = 1
-
-                                user_all_dict[event.user_id].user_update_stop['sex'] = 1
-                            elif len(gender) == 2 and gender[1] == 'женский':
-                                gender_dict['sex'] = 2
-                                gender_flag = 1
-                                user_all_dict[event.user_id].user_update_stop['sex'] = 1
-                            else:
-                                botik.write_msg(event.user_id, f"Повторите ввод пола")
-                                user_all_dict[event.user_id].user_update_stop['sex'] = 0
-
+                            gender_flag = gender(request, user_all_dict[event.user_id], botik)
                             if gender_flag == 1:
-
-                                user_all_dict[event.user_id].param_search.update(gender_dict)
-
-                                flag = check_params(user_all_dict[event.user_id].param_search)
-
+                                flag = check_params(user_all_dict[event.user_id].param_search, user_all_dict, event.user_id, botik)
                                 if flag == 0:
                                     botik.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
                                     user_flag_in[event.user_id] = 1
-
-
                         else:
                             botik.write_msg(event.user_id, f"Вы уже ввели пол. Нажмите: параметры")
 
@@ -449,61 +523,13 @@ for event in botik.longpoll.listen():
 
             elif request.lower().startswith('возраст от'):
                 if all_flag[event.user_id][0] != 1:
-
                     botik.write_msg(event.user_id, 'Напишите с начала: старт, чтобы начать.')
-                    continue
                 else:
-
-
-
                     if event.user_id in user_all_dict:
                         if user_all_dict[event.user_id].user_update_stop['age_from'] == 0:
-                            dict_age_from = dict()
-                            age_from = request.split(' ')
-                            if (len(age_from) == 3) and (age_from[2].isdigit()):
-                                dict_age_from['age_from'] = int(age_from[2])
-                                if ('age_to' in user_all_dict[event.user_id].param_search) and (80 > dict_age_from['age_from'] > 18):
-                                    if user_all_dict[event.user_id].param_search['age_to'] > dict_age_from['age_from']:
-                                        user_all_dict[event.user_id].user_update_stop['age_from'] = 1
-                                        user_all_dict[event.user_id].param_search.update(dict_age_from)
-
-
-                                        flag = check_params(user_all_dict[event.user_id].param_search)
-
-                                        if flag == 0:
-                                            botik.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
-                                            user_flag_in[event.user_id] = 1
-
-
-                                    else:
-
-                                        botik.write_msg(event.user_id, f"Возвраст от неверен")
-
-
-                                elif ('age_to' not in user_all_dict[event.user_id].param_search) and (
-                                        80 > dict_age_from['age_from'] > 18):
-
-                                    user_all_dict[event.user_id].user_update_stop['age_from'] = 1
-                                    user_all_dict[event.user_id].param_search.update(dict_age_from)
-
-                                    flag = check_params(user_all_dict[event.user_id].param_search)
-
-                                    if flag == 0:
-                                        botik.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
-                                        user_flag_in[event.user_id] = 1
-
-
-
-
-                                else:
-                                    botik.write_msg(event.user_id, f"Возраст от неверен")
-
-                            else:
-                                botik.write_msg(event.user_id, f"Возраст от неверен")
-
+                            age_from(request, user_all_dict[event.user_id], botik, user_all_dict, event.user_id)
                         else:
                             botik.write_msg(event.user_id, f"Возраст от введён. Нажмите: параметры")
-
                     else:
                         botik.write_msg(event.user_id, f"С начал нужно нажать: параметры")
 
@@ -514,56 +540,11 @@ for event in botik.longpoll.listen():
 
             elif request.lower().startswith('возраст до'):
                 if all_flag[event.user_id][0] != 1:
-
                     botik.write_msg(event.user_id, 'Напишите с начала: старт, чтобы начать.')
-                    continue
                 else:
-
-
                     if event.user_id in user_all_dict:
                         if user_all_dict[event.user_id].user_update_stop['age_to'] == 0:
-                            dict_age_to = dict()
-                            age_to = request.split(' ')
-                            if (len(age_to) == 3) and (age_to[2].isdigit()):
-                                dict_age_to['age_to'] = int(age_to[2])
-                                if ('age_from' in user_all_dict[event.user_id].param_search) and (80 > dict_age_to['age_to'] > 18):
-                                    if user_all_dict[event.user_id].param_search['age_from'] < dict_age_to['age_to']:
-                                        user_all_dict[event.user_id].param_search.update(dict_age_to)
-                                        user_all_dict[event.user_id].user_update_stop['age_to'] = 1
-
-                                        flag = check_params(user_all_dict[event.user_id].param_search)
-
-                                        if flag == 0:
-                                            botik.write_msg(event.user_id, f"Параметры успешно созданы, нажмите: поиск")
-                                            user_flag_in[event.user_id] = 1
-                                        continue
-                                    else:
-
-                                        botik.write_msg(event.user_id, f"Возвраст до неверен")
-                                        continue
-
-                                elif ('age_from' not in user_all_dict[event.user_id].param_search) and (
-                                        80 > dict_age_to['age_to'] > 18):
-
-                                    user_all_dict[event.user_id].param_search.update(dict_age_to)
-                                    user_all_dict[event.user_id].user_update_stop['age_to'] = 1
-
-                                    flag = check_params(user_all_dict[event.user_id].param_search)
-
-                                    if flag == 0:
-                                        botik.write_msg(event.user_id, f"Параметры успешно созданы, введите: поиск класс")
-
-                                        user_flag_in[event.user_id] = 1
-
-
-                                else:
-
-                                    botik.write_msg(event.user_id, f"Возвраст до неверен")
-                            else:
-                                botik.write_msg(event.user_id, f"Возвраст до неверен")
-
-
-
+                            age_to(request, user_all_dict[event.user_id], botik, user_all_dict, event.user_id)
                         else:
                             botik.write_msg(event.user_id, f"Возвраст до уже введён. Нажмите: параметры")
 
@@ -714,6 +695,4 @@ for event in botik.longpoll.listen():
             else:
 
                 botik.write_msg(event.user_id, "Не понял вашего ответа... Сначала вводите: старт. Потом нажимаете на (параметры). Потом жмуте на (поиск)")
-
-
 
