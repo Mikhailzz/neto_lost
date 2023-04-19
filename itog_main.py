@@ -184,12 +184,12 @@ def check_params(params):
         user_all_dict[event.user_id].user_update_stop['sex'] = 1
     if 'age_from' not in params:
         flag = 1
-        botik.write_msg(event.user_id, f"Введите год первый (Пример: возраст от 20)")
+        botik.write_msg(event.user_id, f"Введите возраст первый (Пример: возраст от 20)")
     else:
         user_all_dict[event.user_id].user_update_stop['age_from'] = 1
     if 'age_to' not in params:
         flag = 1
-        botik.write_msg(event.user_id, f"Введите год первый (Пример: возраст до 25)")
+        botik.write_msg(event.user_id, f"Введите возраст второй (Пример: возраст до 25)")
     else:
         user_all_dict[event.user_id].user_update_stop['age_to'] = 1
     if 'hometown' not in params:
