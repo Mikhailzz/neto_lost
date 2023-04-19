@@ -589,6 +589,7 @@ for event in botik.longpoll.listen():
                                 user_all_dict[event.user_id].user_update_stop['town'] = 0
                                 user_all_dict[event.user_id].user_update_stop['status'] = 0
                                 search_dict.pop(event.user_id)
+                                user_all_dict[event.user_id].index = 0
 
                         else:
 
