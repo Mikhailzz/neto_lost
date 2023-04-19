@@ -673,17 +673,7 @@ for event in botik.longpoll.listen():
 
 
                                 botik.write_msg(event.user_id, f'https://vk.com/id{serch_res[index]["id"]}')
-                                if index == len(serch_res) - 1:
-                                    botik.write_msg(event.user_id,
-                                                    f'Это последний человек. Хотите изменить параметры? Нажмите параметры.')
-                                    user_all_dict[event.user_id].user_update_stop['all'] = 0
-                                    user_all_dict[event.user_id].user_update_stop['sex'] = 0
-                                    user_all_dict[event.user_id].user_update_stop['age_from'] = 0
-                                    user_all_dict[event.user_id].user_update_stop['age_to'] = 0
-                                    user_all_dict[event.user_id].user_update_stop['town'] = 0
-                                    user_all_dict[event.user_id].user_update_stop['status'] = 0
-                                    search_dict.pop(event.user_id)
-                                    user_all_dict[event.user_id].ind = 0
+
                                 user_all_dict[event.user_id].ind = index
 
 
