@@ -166,7 +166,7 @@ def params_search_func(people_info):
     elif sex == 2:
         params_search_dict['sex'] = 1
     if city:
-        params_search_dict['hometown'] = city.title()
+        params_search_dict['hometown'] = city
 
     if year:
         params_search_dict['age_from'] = year - 2
