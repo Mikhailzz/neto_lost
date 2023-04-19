@@ -5,14 +5,14 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 import sqlalchemy as sq
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
-
+# получение токенов
 
 with open('Tokens.txt') as file_object:
     token_user = file_object.readline().strip()
     token_appl = file_object.readline().strip()
 
 
-
+#подключение к базе данных
 
 
 Base = declarative_base()
@@ -51,7 +51,7 @@ create_tables(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-
+# создание класса бота
 
 
 @staticmethod
@@ -86,7 +86,7 @@ class VKBot:
 
 
 
-
+#создание класса вконтакте
 
 class VK:
     def __init__(self, access_token, user_id, version='5.131'):
@@ -97,7 +97,7 @@ class VK:
         self.params = {'access_token': self.token, 'v': self.version}
 
         self.user_update_stop = {}
-
+        # флажки
         self.user_update_stop['all'] = 0
         self.user_update_stop['sex'] = 0
         self.user_update_stop['age_from'] = 0
@@ -139,7 +139,7 @@ class VK:
 
 
 
-
+# функция получения параметров поиска
 
 def params_search_func(people_info):
     if 'sex' in people_info:
@@ -174,6 +174,7 @@ def params_search_func(people_info):
     params_search_dict['status'] = relation
     return params_search_dict
 
+# функция проверки параметров
 
 def check_params(params):
     flag = 0
@@ -218,6 +219,9 @@ search_dict = dict()
 user_all_dict= dict()
 user_flag_in = dict()
 all_flag = {}
+
+# подключение к ВК
+
 for event in botik.longpoll.listen():
 
     if event.type == VkEventType.MESSAGE_NEW:
@@ -225,11 +229,14 @@ for event in botik.longpoll.listen():
 
         if event.to_me:
             request = event.text
+
+            # главный флажок
+
             all_flag.setdefault(event.user_id, []).append(0)
             if len(all_flag[event.user_id]) == 4:
                 all_flag[event.user_id].remove(all_flag[event.user_id][-1])
 
-
+            # старт бота
 
             if request.lower() == 'старт':
                 all_flag[event.user_id][0] = 1
@@ -282,6 +289,7 @@ for event in botik.longpoll.listen():
                         user_flag_in[event.user_id] = 1
                     continue
 
+            # задание семейного положения
 
             elif request.lower().startswith('семейное'):
                 if all_flag[event.user_id][0] != 1:
@@ -700,6 +708,8 @@ for event in botik.longpoll.listen():
                                 user_all_dict.pop(event.user_id)
                                 user_flag_in[event.user_id] = 0
                                 break
+
+            # если будет написано что-то, что бот не поёмёт
 
             else:
 
