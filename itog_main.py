@@ -257,7 +257,7 @@ def main():
 
 
                                     photo = user_all_dict[event.user_id].filefoto(serch_res[index]['id'])
-                                    time.sleep(0.2)
+                                    time.sleep(0.3)
 
                                     if photo.status_code == 200 and 'response' in photo.json():
                                         photo_one = photo.json()
