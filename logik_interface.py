@@ -263,11 +263,7 @@ def search_of_photo(elem, user_id, user:VK, bot:VKBot, session, index):
                                           id_seeker=user_id)
 
                 session.add(people_base_lover)
-
                 session.commit()
-
-
-
                 photo_live = photo_one['response']['items']
                 like_score = 1
                 comm_score = 3
@@ -290,6 +286,5 @@ def search_of_photo(elem, user_id, user:VK, bot:VKBot, session, index):
                 user.ind = index + 1
                 return 1
     else:
-        bot.write_msg(user_id,
-                                f'Сервер не отвечает')
+        bot.write_msg(user_id, f'Сервер не отвечает')
         return 0
