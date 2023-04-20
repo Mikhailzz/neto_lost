@@ -2,6 +2,7 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 import requests
 from vk_user import VK
 import time
+
 import vk_api
 from pprint import pprint
 from vk_api.longpoll import VkLongPoll, VkEventType
@@ -9,6 +10,7 @@ import sqlalchemy as sq
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from base_data import Seeker, Lover, create_base_data
 from tokens import token_user, token_appl
+
 from vk_bot import VKBot
 import logik_interface as log
 
@@ -229,7 +231,6 @@ def main():
 
 
                                 if serch_res[index]['is_closed'] == False:
-                                    print(index, 'index')
                                     if index == len(serch_res) - 1:
                                         botik.write_msg(event.user_id,
                                                         f'Это последний человек. Хотите изменить параметры? Нажмите параметры.')
