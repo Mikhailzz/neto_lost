@@ -243,6 +243,9 @@ def age_to(request, user:VK, bot:VKBot, user_dict, user_id, user_flag_into):
 
 
 def search_of_photo(elem, user_id, user:VK, bot:VKBot, session, index):
+    """
+    функция поиска и добавления человека, если ещё не добавлен
+    """
     photo = user.filefoto(elem['id'])
     time.sleep(0.3)
 
