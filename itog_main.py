@@ -294,6 +294,8 @@ def main():
 
 
                                                     break
+                                            else:
+                                                continue
                                         else:
                                             botik.write_msg(event.user_id,
                                                                     f'Сервер не отвечает')
