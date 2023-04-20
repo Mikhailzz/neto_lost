@@ -19,7 +19,7 @@ def main():
     user_all_dict = dict()
     user_flag_in = dict()
     all_flag = {}
-    count_search = 150
+    count_search = 70
     offset_dict = dict()
     flag_search_off = {}
 
