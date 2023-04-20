@@ -1,13 +1,6 @@
-from vk_api.keyboard import VkKeyboard, VkKeyboardColor
-import requests
 from vk_user import VK
 import time
-
-import vk_api
-from pprint import pprint
-from vk_api.longpoll import VkLongPoll, VkEventType
-import sqlalchemy as sq
-from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from vk_api.longpoll import VkEventType
 from base_data import Seeker, Lover, create_base_data
 from tok import token_user, token_appl
 
