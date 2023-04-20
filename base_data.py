@@ -41,6 +41,9 @@ def create_tables(engine):
 # подключение к базе данных
 
 def create_base_data():
+    """
+    функция создания базы данных
+    """
 
 
 
