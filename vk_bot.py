@@ -1,3 +1,9 @@
+from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+import vk_api
+from vk_api.longpoll import VkLongPoll, VkEventType
+
+
+
 def current_keyboard():
     VK_kb = VkKeyboardColor
     keyboard = VkKeyboard(one_time=False)
@@ -8,9 +14,7 @@ def current_keyboard():
 
     return keyboard.get_keyboard()
 
-from vk_api.keyboard import VkKeyboard, VkKeyboardColor
-import vk_api
-from vk_api.longpoll import VkLongPoll, VkEventType
+
 
 
 
