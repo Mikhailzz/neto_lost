@@ -1,5 +1,7 @@
 from vk_bot import VKBot
 from vk_user import VK
+import time
+from base_data import Seeker, Lover
 
 def params_search_func(people_info):
     """
@@ -238,3 +240,56 @@ def age_to(request, user:VK, bot:VKBot, user_dict, user_id, user_flag_into):
     else:
         bot.write_msg(user_id, f"Возвраст до неверен")
         return user_flag_into
+
+
+def search_of_photo(elem, user_id, user:VK, bot:VKBot, session, index):
+    photo = user.filefoto(elem['id'])
+    time.sleep(0.3)
+
+
+    if photo.status_code == 200 and 'response' in photo.json():
+        photo_one = photo.json()
+
+        if photo_one['response']['count'] != 0:
+
+
+            e = session.query(Lover).filter(Lover.id == elem['id'],
+                                               Lover.id_seeker == user_id)
+
+            if not e.all():
+                people_base_lover = Lover(id=elem['id'],
+                                          first_name=elem['first_name'],
+                                          last_name=elem['last_name'],
+                                          id_seeker=user_id)
+
+                session.add(people_base_lover)
+
+                session.commit()
+
+
+
+                photo_live = photo_one['response']['items']
+                like_score = 1
+                comm_score = 3
+                sort_pgoto = lambda x: (x['likes']['count'], x['comments']['count'])[
+                    x['likes']['count'] * like_score <= x['comments']['count'] * comm_score]
+                new_sort_data = sorted(photo_live, key=sort_pgoto, reverse=True)
+                count = 0
+
+                string_attach = ''
+                for elements in new_sort_data:
+
+                    count += 1
+                    string_attach += f'photo{elem["id"]}_{elements["id"]},'
+                    if count == 3:
+                        break
+
+                bot.write_msg(user_id, '', attachment=string_attach[:-1])
+                bot.write_msg(user_id, f'https://vk.com/id{elem["id"]}')
+
+                user.ind = index + 1
+                return 1
+    else:
+        bot.write_msg(user_id,
+                                f'Сервер не отвечает')
+        return 0
