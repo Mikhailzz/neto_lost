@@ -50,11 +50,12 @@ class VK:
         response = requests.get(url, params={**self.params, **params})
         return response
 
-    def search(self, params):
+    def search(self, params, count, offset):
         """
         функция поиска людей
         """
-        main_param = {'count': 150}
+        main_param = {'count': count,
+                      'offset': offset}
 
         url = 'https://api.vk.com/method/users.search'
         response = requests.get(url, params={**self.params, **params, **main_param})

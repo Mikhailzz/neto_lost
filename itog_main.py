@@ -9,7 +9,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 import sqlalchemy as sq
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from base_data import Seeker, Lover, create_base_data
-from tokens import token_user, token_appl
+from tok import token_user, token_appl
 
 from vk_bot import VKBot
 import logik_interface as log
@@ -26,6 +26,9 @@ def main():
     user_all_dict= dict()
     user_flag_in = dict()
     all_flag = {}
+    count_search = 150
+    offset = 0
+    flag_search_off = {}
 
     # подключение к ВК
 
@@ -61,6 +64,7 @@ def main():
                     else:
                         if event.user_id not in user_all_dict:
                             user_all_dict[event.user_id] = VK(token_user, event.user_id)
+                        flag_search_off.setdefault(event.user_id, 0)
 
                         inform_user = user_all_dict[event.user_id].users_info()
                         if inform_user.status_code == 200 and 'response' in inform_user.json():
@@ -203,11 +207,13 @@ def main():
                             user_flag_in[event.user_id] = 0
                             botik.write_msg(event.user_id, 'Поиск невозможен. Нажмите: параметры')
                         elif user_flag_in[event.user_id] == 1:
-                            count_r = 0
+
                             if event.user_id not in search_dict:
                                 search_dict[event.user_id] = []
                                 parametrs_search = user_all_dict[event.user_id].param_search
-                                serch_str = user_all_dict[event.user_id].search(parametrs_search)
+                                if flag_search_off[event.user_id] == 0:
+                                    offset = 0
+                                serch_str = user_all_dict[event.user_id].search(parametrs_search, count_search, offset)
                                 if serch_str.status_code == 200 and 'response' in serch_str.json():
                                     serch_str = serch_str.json()
                                     search_dict[event.user_id] = serch_str['response']['items']
@@ -229,11 +235,10 @@ def main():
 
                             for index in range(user_all_dict[event.user_id].ind, len(serch_res)):
 
-                                count_r += 1
 
 
                                 if serch_res[index]['is_closed'] == False:
-                                    if index == len(serch_res) - 1:
+                                    if index == len(serch_res) - 1 and len(serch_res) != count_search:
                                         botik.write_msg(event.user_id,
                                                         f'Это последний человек. Хотите изменить параметры? Нажмите параметры.')
 
@@ -241,17 +246,27 @@ def main():
 
                                         user_all_dict.pop(event.user_id)
                                         user_flag_in[event.user_id] = 0
+                                        flag_search_off[event.user_id] = 0
                                         break
-                                    count_i = 0
+                                    elif index == len(serch_res) - 1 and len(serch_res) == count_search:
+                                        botik.write_msg(event.user_id,
+                                                        f'Нажмите ещё раз поиск')
 
+                                        search_dict.pop(event.user_id)
+                                        offset += count_search
+                                        user_all_dict[event.user_id].ind = 0
+                                        flag_search_off[event.user_id] = 1
+
+
+                                        break
 
 
                                     photo = user_all_dict[event.user_id].filefoto(serch_res[index]['id'])
                                     time.sleep(0.2)
-                                    count_i += 1
+
                                     if photo.status_code == 200 and 'response' in photo.json():
                                         photo_one = photo.json()
-                                        count_i += 1
+
 
                                         if photo_one['response']['count'] == 0:
                                             continue
@@ -261,7 +276,7 @@ def main():
                                         e = session_bd.query(Lover).filter(Lover.id == serch_res[index]['id'],
                                                                           Lover.id_seeker == event.user_id)
 
-                                        count_i += 1
+
                                         super_list.append([elem for elem in e.all()])
 
                                         if not e.all():
@@ -307,13 +322,25 @@ def main():
                                                         f'Сервер не отвечает')
                                         continue
 
-                                if index == len(serch_res) - 1:
+                                if index == len(serch_res) - 1 and len(serch_res) != count_search:
                                     botik.write_msg(event.user_id,
-                                                        f'Это последний человек. Хотите изменить параметры? Нажмите параметры.')
+                                                    f'Это последний человек. Хотите изменить параметры? Нажмите параметры.')
 
                                     search_dict.pop(event.user_id)
+
                                     user_all_dict.pop(event.user_id)
                                     user_flag_in[event.user_id] = 0
+                                    flag_search_off[event.user_id] = 0
+                                    break
+                                elif index == len(serch_res) - 1 and len(serch_res) == count_search:
+                                    botik.write_msg(event.user_id,
+                                                    f'Нажмите ещё раз поиск')
+
+                                    search_dict.pop(event.user_id)
+                                    offset += count_search
+                                    user_all_dict[event.user_id].ind = 0
+                                    flag_search_off[event.user_id] = 1
+
                                     break
 
                 # если будет написано что-то, что бот не поёмёт
