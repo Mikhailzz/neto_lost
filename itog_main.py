@@ -245,14 +245,62 @@ def main():
                                     elif index == len(serch_res) - 1 and len(serch_res) == count_search:
                                         botik.write_msg(event.user_id,
                                                         f'Нажмите ещё раз поиск')
-
                                         search_dict.pop(event.user_id)
                                         offset_dict[event.user_id] += count_search
                                         user_all_dict[event.user_id].ind = 0
                                         flag_search_off[event.user_id] = 1
+                                        photo = user_all_dict[event.user_id].filefoto(serch_res[index]['id'])
+                                        time.sleep(0.3)
+
+                                        if photo.status_code == 200 and 'response' in photo.json():
+                                            photo_one = photo.json()
+
+                                            if photo_one['response']['count'] != 0:
 
 
-                                        break
+                                                e = session_bd.query(Lover).filter(Lover.id == serch_res[index]['id'],
+                                                                                   Lover.id_seeker == event.user_id)
+
+                                                if not e.all():
+                                                    people_base_lover = Lover(id=serch_res[index]['id'],
+                                                                              first_name=serch_res[index]['first_name'],
+                                                                              last_name=serch_res[index]['last_name'],
+                                                                              id_seeker=event.user_id)
+
+                                                    session_bd.add(people_base_lover)
+
+                                                    session_bd.commit()
+
+
+
+                                                    photo_live = photo_one['response']['items']
+                                                    like_score = 1
+                                                    comm_score = 3
+                                                    sort_pgoto = lambda x: (x['likes']['count'], x['comments']['count'])[
+                                                        x['likes']['count'] * like_score <= x['comments']['count'] * comm_score]
+                                                    new_sort_data = sorted(photo_live, key=sort_pgoto, reverse=True)
+                                                    count = 0
+
+                                                    string_attach = ''
+                                                    for elements in new_sort_data:
+
+                                                        count += 1
+                                                        string_attach += f'photo{serch_res[index]["id"]}_{elements["id"]},'
+                                                        if count == 3:
+                                                            break
+
+                                                    botik.write_msg(event.user_id, '', attachment=string_attach[:-1])
+                                                    botik.write_msg(event.user_id, f'https://vk.com/id{serch_res[index]["id"]}')
+
+
+                                                    break
+                                        else:
+                                            botik.write_msg(event.user_id,
+                                                                    f'Сервер не отвечает')
+                                            continue
+
+
+
 
 
                                     photo = user_all_dict[event.user_id].filefoto(serch_res[index]['id'])
