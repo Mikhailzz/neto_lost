@@ -21,7 +21,6 @@ def main():
     all_flag = {}
     count_search = 150
     offset_dict = dict()
-    offset = 0
     flag_search_off = {}
 
     # подключение к ВК
@@ -266,13 +265,8 @@ def main():
                                         if photo_one['response']['count'] == 0:
                                             continue
 
-                                        super_list = []
-
                                         e = session_bd.query(Lover).filter(Lover.id == serch_res[index]['id'],
                                                                           Lover.id_seeker == event.user_id)
-
-
-                                        super_list.append([elem for elem in e.all()])
 
                                         if not e.all():
                                             people_base_lover = Lover(id=serch_res[index]['id'],
@@ -284,11 +278,7 @@ def main():
 
                                             session_bd.commit()
 
-
-
-
                                         else:
-                                            super_list.clear()
                                             continue
 
                                         photo_live = photo_one['response']['items']
