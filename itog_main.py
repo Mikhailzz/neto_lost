@@ -84,6 +84,7 @@ def main():
                             continue
                         else:
                             botik.write_msg(event.user_id, f"Сервер не отвечает")
+                            continue
 
                 # задание семейного положения
 
@@ -221,6 +222,7 @@ def main():
                                 else:
                                     botik.write_msg(event.user_id,
                                                     f'Сервер не отвечает')
+                                    continue
 
                             else:
                                 serch_res = search_dict[event.user_id]
