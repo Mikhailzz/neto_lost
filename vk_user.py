@@ -54,7 +54,7 @@ class VK:
         """
         функция поиска людей
         """
-        main_param = {'count': 100}
+        main_param = {'count': 150}
 
         url = 'https://api.vk.com/method/users.search'
         response = requests.get(url, params={**self.params, **params, **main_param})
