@@ -20,6 +20,7 @@ def main():
     user_flag_in = dict()
     all_flag = {}
     count_search = 150
+    offset_dict = dict()
     offset = 0
     flag_search_off = {}
 
@@ -57,7 +58,8 @@ def main():
                     else:
                         if event.user_id not in user_all_dict:
                             user_all_dict[event.user_id] = VK(token_user, event.user_id)
-                        flag_search_off.setdefault(event.user_id, 0)
+                            flag_search_off.setdefault(event.user_id, 0)
+                            offset_dict.setdefault(event.user_id, 0)
 
                         inform_user = user_all_dict[event.user_id].users_info()
                         if inform_user.status_code == 200 and 'response' in inform_user.json():
@@ -205,8 +207,8 @@ def main():
                                 search_dict[event.user_id] = []
                                 parametrs_search = user_all_dict[event.user_id].param_search
                                 if flag_search_off[event.user_id] == 0:
-                                    offset = 0
-                                serch_str = user_all_dict[event.user_id].search(parametrs_search, count_search, offset)
+                                    offset_dict[event.user_id] = 0
+                                serch_str = user_all_dict[event.user_id].search(parametrs_search, count_search, offset_dict[event.user_id])
                                 if serch_str.status_code == 200 and 'response' in serch_str.json():
                                     serch_str = serch_str.json()
                                     search_dict[event.user_id] = serch_str['response']['items']
@@ -246,7 +248,7 @@ def main():
                                                         f'Нажмите ещё раз поиск')
 
                                         search_dict.pop(event.user_id)
-                                        offset += count_search
+                                        offset_dict[event.user_id] += count_search
                                         user_all_dict[event.user_id].ind = 0
                                         flag_search_off[event.user_id] = 1
 
@@ -330,7 +332,7 @@ def main():
                                                     f'Нажмите ещё раз поиск')
 
                                     search_dict.pop(event.user_id)
-                                    offset += count_search
+                                    offset_dict[event.user_id] += count_search
                                     user_all_dict[event.user_id].ind = 0
                                     flag_search_off[event.user_id] = 1
 
