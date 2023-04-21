@@ -37,7 +37,7 @@ class VK:
 
         try:
              response.status_code = 200
-        except KeyError:
+        except ConnectionError:
             return []
 
         response = response.json()
@@ -65,7 +65,7 @@ class VK:
 
         try:
              response.status_code = 200
-        except KeyError:
+        except ConnectionError:
             return []
 
         response = response.json()
@@ -91,7 +91,7 @@ class VK:
 
         try:
              response.status_code = 200
-        except KeyError:
+        except ConnectionError:
             return []
 
         response = response.json()
