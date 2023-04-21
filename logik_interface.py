@@ -250,10 +250,10 @@ def search_of_photo(elem, user_id, user:VK, bot:VKBot, session, index):
     time.sleep(0.3)
 
 
-    if photo.status_code == 200 and 'response' in photo.json():
-        photo_one = photo.json()
+    if photo:
 
-        if photo_one['response']['count'] != 0:
+
+        if photo['count'] != 0:
 
 
             e = session.query(Lover).filter(Lover.id == elem['id'],
@@ -267,7 +267,7 @@ def search_of_photo(elem, user_id, user:VK, bot:VKBot, session, index):
 
                 session.add(people_base_lover)
                 session.commit()
-                photo_live = photo_one['response']['items']
+                photo_live = photo['items']
                 like_score = 1
                 comm_score = 3
                 sort_pgoto = lambda x: (x['likes']['count'], x['comments']['count'])[

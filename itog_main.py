@@ -2,7 +2,7 @@ from vk_user import VK
 import time
 from vk_api.longpoll import VkEventType
 from base_data import Seeker, Lover, create_base_data
-from tokens import token_user, token_appl
+from tok import token_user, token_appl
 
 from vk_bot import VKBot
 import logik_interface as log
@@ -61,10 +61,10 @@ def main():
                             offset_dict.setdefault(event.user_id, 0)
 
                         inform_user = user_all_dict[event.user_id].users_info()
-                        if inform_user.status_code == 200 and 'response' in inform_user.json():
+                        if inform_user:
 
-                            inform_user = inform_user.json()
-                            inform = inform_user['response'][0]
+
+                            inform = inform_user[0]
                             people = log.parameters(user_all_dict[event.user_id], inform)
 
                             q = session_bd.query(Seeker).filter(Seeker.id == people['id'])
@@ -208,9 +208,8 @@ def main():
                                 if flag_search_off[event.user_id] == 0:
                                     offset_dict[event.user_id] = 0
                                 serch_str = user_all_dict[event.user_id].search(parametrs_search, count_search, offset_dict[event.user_id])
-                                if serch_str.status_code == 200 and 'response' in serch_str.json():
-                                    serch_str = serch_str.json()
-                                    search_dict[event.user_id] = serch_str['response']['items']
+                                if serch_str:
+                                    search_dict[event.user_id] = serch_str['items']
                                     serch_res = search_dict[event.user_id]
                                     if len(serch_res) == 0:
                                         botik.write_msg(event.user_id,

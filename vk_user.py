@@ -34,6 +34,14 @@ class VK:
         paramss = {'fields':'bdate, sex, home_town, relation'}
         params = {'user_ids': self.id}
         response = requests.get(url, params={**self.params, **params, **paramss})
+
+        response = response.json()
+
+        try:
+            response = response['response']
+        except KeyError:
+            return []
+
         return response
 
 
@@ -48,6 +56,15 @@ class VK:
                   }
         url = 'https://api.vk.com/method/photos.get'
         response = requests.get(url, params={**self.params, **params})
+        response = response.json()
+
+        try:
+            response = response['response']
+        except KeyError:
+            return []
+
+
+
         return response
 
     def search(self, params, count, offset):
@@ -59,4 +76,14 @@ class VK:
 
         url = 'https://api.vk.com/method/users.search'
         response = requests.get(url, params={**self.params, **params, **main_param})
+        response = response.json()
+
+        try:
+            response = response['response']
+        except KeyError:
+            return []
+
+
+
+
         return response
