@@ -36,8 +36,8 @@ class VK:
         response = requests.get(url, params={**self.params, **params, **paramss})
 
         try:
-             response.status_code = 200
-        except ConnectionError:
+             response.raise_for_status()
+        except requests.exceptions.HTTPError:
             return []
 
         response = response.json()
@@ -62,10 +62,9 @@ class VK:
         url = 'https://api.vk.com/method/photos.get'
         response = requests.get(url, params={**self.params, **params})
 
-
         try:
-             response.status_code = 200
-        except ConnectionError:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError:
             return []
 
         response = response.json()
@@ -90,8 +89,8 @@ class VK:
         response = requests.get(url, params={**self.params, **params, **main_param})
 
         try:
-             response.status_code = 200
-        except ConnectionError:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError:
             return []
 
         response = response.json()
