@@ -2,7 +2,7 @@ from vk_user import VK
 import time
 from vk_api.longpoll import VkEventType
 from base_data import Seeker, Lover, create_base_data
-from tok import token_user, token_appl
+from tokens import token_user, token_appl
 
 from vk_bot import VKBot
 import logik_interface as log
