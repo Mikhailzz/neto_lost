@@ -41,6 +41,10 @@ class VK:
             return []
         except requests.exceptions.ConnectionError:
             return []
+        except requests.exceptions.RequestException:
+            return []
+        except requests.exceptions.ReadTimeout:
+            return []
 
         response = response.json()
 
@@ -70,6 +74,10 @@ class VK:
             return []
         except requests.exceptions.ConnectionError:
             return []
+        except requests.exceptions.RequestException:
+            return []
+        except requests.exceptions.ReadTimeout:
+            return []
 
         response = response.json()
 
@@ -97,6 +105,10 @@ class VK:
         except requests.exceptions.HTTPError:
             return []
         except requests.exceptions.ConnectionError:
+            return []
+        except requests.exceptions.RequestException:
+            return []
+        except requests.exceptions.ReadTimeout:
             return []
 
         response = response.json()
