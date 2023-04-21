@@ -33,11 +33,13 @@ class VK:
         url = 'https://api.vk.com/method/users.get'
         paramss = {'fields':'bdate, sex, home_town, relation'}
         params = {'user_ids': self.id}
-        response = requests.get(url, params={**self.params, **params, **paramss})
 
         try:
-             response.raise_for_status()
+            response = requests.get(url, params={**self.params, **params, **paramss})
+            response.raise_for_status()
         except requests.exceptions.HTTPError:
+            return []
+        except requests.exceptions.ConnectionError:
             return []
 
         response = response.json()
@@ -60,11 +62,13 @@ class VK:
                   'extended': '1'
                   }
         url = 'https://api.vk.com/method/photos.get'
-        response = requests.get(url, params={**self.params, **params})
 
         try:
+            response = requests.get(url, params={**self.params, **params})
             response.raise_for_status()
         except requests.exceptions.HTTPError:
+            return []
+        except requests.exceptions.ConnectionError:
             return []
 
         response = response.json()
@@ -86,11 +90,13 @@ class VK:
                       'offset': offset}
 
         url = 'https://api.vk.com/method/users.search'
-        response = requests.get(url, params={**self.params, **params, **main_param})
 
         try:
+            response = requests.get(url, params={**self.params, **params, **main_param})
             response.raise_for_status()
         except requests.exceptions.HTTPError:
+            return []
+        except requests.exceptions.ConnectionError:
             return []
 
         response = response.json()
