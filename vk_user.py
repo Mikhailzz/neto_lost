@@ -35,6 +35,11 @@ class VK:
         params = {'user_ids': self.id}
         response = requests.get(url, params={**self.params, **params, **paramss})
 
+        try:
+             response.status_code = 200
+        except KeyError:
+            return []
+
         response = response.json()
 
         try:
@@ -56,6 +61,13 @@ class VK:
                   }
         url = 'https://api.vk.com/method/photos.get'
         response = requests.get(url, params={**self.params, **params})
+
+
+        try:
+             response.status_code = 200
+        except KeyError:
+            return []
+
         response = response.json()
 
         try:
@@ -76,6 +88,12 @@ class VK:
 
         url = 'https://api.vk.com/method/users.search'
         response = requests.get(url, params={**self.params, **params, **main_param})
+
+        try:
+             response.status_code = 200
+        except KeyError:
+            return []
+
         response = response.json()
 
         try:
