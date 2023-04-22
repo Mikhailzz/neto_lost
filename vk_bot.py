@@ -1,6 +1,7 @@
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
+from vk_api.utils import get_random_id
 
 
 
@@ -37,6 +38,6 @@ class VKBot:
         self.vk.method('messages.send',
                                {'user_id': user_id,
                                 'message': message,
-                                'random_id': 0,
+                                'random_id': get_random_id(),
                                 'keyboard': self.keyboard,
                                 'attachment': attachment})
