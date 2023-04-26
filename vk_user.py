@@ -37,14 +37,17 @@ class VK:
         try:
             response = requests.get(url, params={**self.params, **params, **paramss})
             response.raise_for_status()
-        except requests.exceptions.HTTPError:
+        except requests.HTTPError:
             return []
-        except requests.exceptions.ConnectionError:
+        except requests.ConnectionError:
             return []
-        except requests.exceptions.RequestException:
+        except requests.RequestException:
             return []
-        except requests.exceptions.ReadTimeout:
+        except requests.ReadTimeout:
             return []
+        except requests.JSONDecodeError:
+            return []
+
 
         response = response.json()
 
@@ -70,13 +73,15 @@ class VK:
         try:
             response = requests.get(url, params={**self.params, **params})
             response.raise_for_status()
-        except requests.exceptions.HTTPError:
+        except requests.HTTPError:
             return []
-        except requests.exceptions.ConnectionError:
+        except requests.ConnectionError:
             return []
-        except requests.exceptions.RequestException:
+        except requests.RequestException:
             return []
-        except requests.exceptions.ReadTimeout:
+        except requests.ReadTimeout:
+            return []
+        except requests.JSONDecodeError:
             return []
 
         response = response.json()
@@ -102,13 +107,15 @@ class VK:
         try:
             response = requests.get(url, params={**self.params, **params, **main_param})
             response.raise_for_status()
-        except requests.exceptions.HTTPError:
+        except requests.HTTPError:
             return []
-        except requests.exceptions.ConnectionError:
+        except requests.ConnectionError:
             return []
-        except requests.exceptions.RequestException:
+        except requests.RequestException:
             return []
-        except requests.exceptions.ReadTimeout:
+        except requests.ReadTimeout:
+            return []
+        except requests.JSONDecodeError:
             return []
 
         response = response.json()
